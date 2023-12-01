@@ -1,25 +1,25 @@
 #!/usr/bin/python3
 
-from celery import Celery
+from celery import Celery, shared_task
 
 import zipfile
 import concurrent.futures
+import os
 
-REDIS_URL = 'redis://localhost:6379/0'
-BACKEND_URL = 'redis://localhost:6379/0'
-
-app = Celery('zipcracker_tasks', broker=REDIS_URL, backend=BACKEND_URL)
+app = Celery('tasks', broker=os.environ["REDIS_URL"], backend=os.environ["BACKEND_URL"])
 
 passwords = []
-with open("/home/abd/HTB/SecLists/Passwords/Leaked-Databases/rockyou.txt", "rb") as f:
+with open("/app/wordlists/rockyou.txt", "rb") as f:
     passwords = f.read().splitlines()
 
-@app.task
+@shared_task(name="bruteforce")
 def bruteforce(zip_path):
     n_cores = 8
     n_per_core = len(passwords) // n_cores
     
     indexes = [(i, i + n_per_core) for i in range(0, len(passwords), n_per_core)]
+    
+    zip_path = "/app/" + zip_path
 
     with concurrent.futures.ProcessPoolExecutor() as executor:
         found = False
@@ -31,8 +31,7 @@ def bruteforce(zip_path):
                     return future.result()
 
 def crack_zip(zip_path, start, end):
-    # debug print on celery
-    print(f"Trying {start} to {end}")
+    print("Trying {} to {}".format(start, end))
     for i in range(start, end):
         with zipfile.ZipFile(zip_path) as zf:
             try:

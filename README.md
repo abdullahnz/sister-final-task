@@ -2,17 +2,13 @@
 
 ## How to run
 
-1. Run redis service (with default configuration)
-2. Run celery
+1. Install docker engine on your computer and `docker-compose`.
+
+2. Downloads [rockyou.txt.gz](https://github.com/praetorian-inc/Hob0Rules/blob/master/wordlists/rockyou.txt.gz) and extract to `wordlists/`.
+3. Run api with docker
 
 ```
-celery -A tasks.zipcracker_tasks worker -P threads --loglevel=INFO
-```
-
-3. Run main.py
-
-```
-python3 main.py
+docker-compose up -d --build
 ```
 
 4. Run client on `views` folder

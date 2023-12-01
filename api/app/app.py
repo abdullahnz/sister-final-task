@@ -2,19 +2,14 @@
 
 from fastapi import FastAPI, UploadFile
 from fastapi.responses import JSONResponse
-from fastapi.middleware.cors import CORSMiddleware
-from tasks.zipcracker_tasks import bruteforce
+from celery import Celery
+import os
+
+celery = Celery('tasks', broker=os.environ["REDIS_URL"], backend=os.environ["BACKEND_URL"])
+    
 import uvicorn
 
 app = FastAPI()
-
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=True,
-    allow_methods=["*"], 
-    allow_headers=["*"],
-)
 
 @app.get("/")
 async def root():
@@ -22,18 +17,19 @@ async def root():
 
 @app.post("/zipcrack")
 async def zipcrack(zip_file: UploadFile):
-    zip_path = f"/tmp/{zip_file.filename}"
+    zip_path = f"uploads/{zip_file.filename}"
     
     with open(zip_path, "wb") as f:
         f.write(zip_file.file.read())
     
-    task = bruteforce.delay(zip_path)
+    task = celery.send_task("bruteforce", args=(zip_path, ))
     
     return {"task_id": task.id}
+    
 
 @app.get("/zipcrack/{task_id}")
 async def status(task_id: str):
-    result = bruteforce.AsyncResult(task_id)
+    result = celery.AsyncResult(task_id)
     
     password = result.get() if result.status == "SUCCESS" else None
     
