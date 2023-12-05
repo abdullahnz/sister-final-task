@@ -18,7 +18,7 @@ function App() {
       if (file.status === 0) {
         const resp = await ZipCracker.getStatus(file.taskId);
 
-        if (resp.status === "SUCCESS") {
+        if (resp?.status === "SUCCESS") {
           const updatedFiles = files.map((file) => {
             if (file.taskId === resp.task_id) {
               return { ...file, status: 1, result: resp.result };
@@ -55,6 +55,10 @@ function App() {
     setFile(null);
   };
 
+  const clearSession = () => {
+    setFiles([]);
+  };
+
   return (
     <div className="container mt-5">
       <h1 className="text-center mb-5">Parallel Zip Cracker (with 16million++ wordlists)</h1>
@@ -69,7 +73,10 @@ function App() {
 
       <FileInfo file={file} />
 
-      <div className="d-flex justify-content-end">
+      <div className="d-flex justify-content-end gap-2">
+        <button className="btn btn-primary" onClick={clearSession}>
+          Clear session
+        </button>
         <button className="btn btn-primary" onClick={handleAddFile}>
           Add file
         </button>

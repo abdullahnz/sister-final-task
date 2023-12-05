@@ -6,32 +6,32 @@ services:
     networks:
       - default
     environment:
-      - REDIS_URL=redis://datastore:6379/0
-      - BACKEND_URL=redis://datastore:6379/0
+      - REDIS_URL=redis://redis:6379/0
+      - BACKEND_URL=redis://redis:6379/1
     restart: always
     depends_on:
-      - datastore
+      - redis
     ports:
       - "8000:8000"
     volumes:
-      - uploads:/app/uploads
+      - uploads:/app/uploads:rw
 
   celery:
     build: tasks
     networks:
       - default
     environment:
-      - REDIS_URL=redis://datastore:6379/0
-      - BACKEND_URL=redis://datastore:6379/0
-      - CELERY_RESULT_BACKEND=redis://datastore:6379/0
+      - REDIS_URL=redis://redis:6379/0
+      - BACKEND_URL=redis://redis:6379/1
+      - CELERY_RESULT_BACKEND=redis://redis:6379/1
     restart: always
     depends_on:
-      - datastore
+      - redis
     volumes:
-      - uploads:/app/uploads
+      - uploads:/app/uploads:rw
       - ./wordlists:/app/wordlists
 
-  datastore:
+  redis:
     image: redis:latest
     networks:
       - default

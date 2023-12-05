@@ -1,3 +1,3 @@
 #!/bin/sh
 
-celery -A tasks worker -P threads --loglevel=info
+celery -A tasks worker -P threads --loglevel=INFO

@@ -1,43 +1,28 @@
 #!/usr/bin/python3
 
 from celery import Celery, shared_task
-
-import zipfile
-import concurrent.futures
+from core.zipcracker import ZipCracker
 import os
 
-app = Celery('tasks', broker=os.environ["REDIS_URL"], backend=os.environ["BACKEND_URL"])
+# 200000 first passwords from rockyou.txt
+ROCKYOU_PATH = "wordlists/rockyou_chunks/rockyou_aa"
+
+# split -l 200000 rockyou.txt wordlists/rockyou_chunks/rockyou_
+WORDLIST_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), 
+                             ROCKYOU_PATH)
+
+BROKER_URL = os.getenv("REDIS_URL")
+BACKEND_URL = os.getenv("BACKEND_URL")
+
+app = Celery('tasks', broker=BROKER_URL, backend=BACKEND_URL)
 
 passwords = []
-with open("/app/wordlists/rockyou.txt", "rb") as f:
+with open(WORDLIST_PATH, "rb") as f:
     passwords = f.read().splitlines()
 
 @shared_task(name="bruteforce")
-def bruteforce(zip_path):
-    n_cores = 8
-    n_per_core = len(passwords) // n_cores
+def bruteforce(zip_path):        
+    cracker = ZipCracker(zip_path, passwords)
+    result = cracker.concurrent_crack()
     
-    indexes = [(i, i + n_per_core) for i in range(0, len(passwords), n_per_core)]
-    
-    zip_path = "/app/" + zip_path
-
-    with concurrent.futures.ProcessPoolExecutor() as executor:
-        found = False
-        for start, end in indexes:
-            if not found:
-                future = executor.submit(crack_zip, zip_path, start, end)
-                if future.result():
-                    found = True
-                    return future.result()
-
-def crack_zip(zip_path, start, end):
-    print("Trying {} to {}".format(start, end))
-    for i in range(start, end):
-        with zipfile.ZipFile(zip_path) as zf:
-            try:
-                zf.extractall("/tmp", pwd = passwords[i])
-                return passwords[i]
-            except Exception as e:
-                pass
-    
-    
+    return result
