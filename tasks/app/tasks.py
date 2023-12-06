@@ -5,7 +5,7 @@ from core.zipcracker import ZipCracker
 import os
 
 # 200000 first passwords from rockyou.txt
-ROCKYOU_PATH = "wordlists/rockyou_chunks/rockyou_aa"
+ROCKYOU_PATH = os.getenv("ROCKYOU_PATH")
 
 # split -l 200000 rockyou.txt wordlists/rockyou_chunks/rockyou_
 WORDLIST_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), 

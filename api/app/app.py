@@ -4,10 +4,12 @@ from fastapi import FastAPI, UploadFile
 from fastapi.responses import JSONResponse
 from celery import Celery
 import os
-
-celery = Celery('tasks', broker=os.environ["REDIS_URL"], backend=os.environ["BACKEND_URL"])
-    
 import uvicorn
+
+BROKER_URL = os.getenv("REDIS_URL")
+BACKEND_URL = os.getenv("BACKEND_URL")
+
+celery = Celery('tasks', broker=BROKER_URL, backend=BACKEND_URL)
 
 app = FastAPI()
 
