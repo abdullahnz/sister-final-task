@@ -6,7 +6,7 @@ services:
     networks:
       - default
     environment:
-      - REDIS_URL=redis://redis:6379/0
+      - BROKER_URL=redis://redis:6379/0
       - BACKEND_URL=redis://redis:6379/1
     restart: always
     depends_on:
@@ -21,7 +21,7 @@ services:
     networks:
       - default
     environment:
-      - REDIS_URL=redis://redis:6379/0
+      - BROKER_URL=redis://redis:6379/0
       - BACKEND_URL=redis://redis:6379/1
       - CELERY_RESULT_BACKEND=redis://redis:6379/1
       - ROCKYOU_PATH=./wordlists/rockyou_200k.txt

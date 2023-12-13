@@ -16,9 +16,8 @@ class ZipCracker:
         n_passwords = len(self.passwords)
         n_per_core = n_passwords // self.n_cores
         
-        result = None
-        
-        with concurrent.futures.ThreadPoolExecutor() as executor:    
+        result = None        
+        with concurrent.futures.ProcessPoolExecutor() as executor:    
             futures = [
                 executor.submit(self.crack_zip_range, i, i + n_per_core)
                 for i in range(0, n_passwords, n_per_core)

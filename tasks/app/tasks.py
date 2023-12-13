@@ -11,7 +11,7 @@ ROCKYOU_PATH = os.getenv("ROCKYOU_PATH")
 WORDLIST_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), 
                              ROCKYOU_PATH)
 
-BROKER_URL = os.getenv("REDIS_URL")
+BROKER_URL = os.getenv("BROKER_URL")
 BACKEND_URL = os.getenv("BACKEND_URL")
 
 app = Celery('tasks', broker=BROKER_URL, backend=BACKEND_URL)

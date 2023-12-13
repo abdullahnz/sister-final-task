@@ -61,7 +61,7 @@ function App() {
 
   return (
     <div className="container mt-5">
-      <h1 className="text-center mb-5">Parallel Zip Cracker (with 16million++ wordlists)</h1>
+      <h1 className="text-center mb-5">Parallel Zip Cracker</h1>
 
       <FileUploader
         handleChange={handleChange}

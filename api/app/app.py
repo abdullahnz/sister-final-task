@@ -6,7 +6,7 @@ from celery import Celery
 import os
 import uvicorn
 
-BROKER_URL = os.getenv("REDIS_URL")
+BROKER_URL = os.getenv("BROKER_URL")
 BACKEND_URL = os.getenv("BACKEND_URL")
 
 celery = Celery('tasks', broker=BROKER_URL, backend=BACKEND_URL)
